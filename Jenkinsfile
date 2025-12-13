@@ -29,11 +29,17 @@ pipeline{
             agent{
                 docker{
                     image 'docker:27-cli'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    args '
+                    -v /var/run/docker.sock:/var/run/docker.sock
+                    -e DOCKER_CONFIG=/tmp/.docker
+                    '''
                 }
             }
             steps{
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                sh '''
+                mkdir -p /tmp/.docker
+                docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                '''
             }
         }
 
@@ -41,12 +47,16 @@ pipeline{
             agent{
                 docker{
                     image 'docker:27-cli'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    args '''
+                    -v /var/run/docker.sock:/var/run/docker.sock
+                    -e DOCKER_CONFIG=/tmp/.docker
+                    '''
                 }
             }
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh '''
+                      mkdir -p /tmp/.docker
                       echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                       docker push $IMAGE_NAME:$IMAGE_TAG
                     '''
