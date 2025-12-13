@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expenses-mysql
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expenses-mysql
+  template:
+    metadata:
+      labels:
+        app: expenses-mysql
+    spec:
+      containers:
+        - name: mysql 
+          image: mysql:8
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: mysql-user
+                  name: mysql-secret
+            - name: MYSQL_PASSWORD 
+              valueFrom:
+                secretKeyRef:
+                  key: mysql-password
+                  name: mysql-secret
+            - name: MYSQL_DATABASE 
+              valueFrom:
+                configMapKeyRef:
+                  key: mysql_database
+                  name: mysql-config
+              
+        
+    

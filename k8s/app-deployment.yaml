@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expenses-web
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expenses-web
+  template:
+    metadata:
+      labels:
+        app: expenses-web
+    spec:
+      containers:
+        - name: expenses-web
+          image: jyotsna2181/expenses-tracker-webapp:1.0
+          ports:
+            - containerPort: 8080
+
+          envFrom:
+            - configMapRef:
+                name: expenses-web-config
+            - secretRef:
+                name: expenses-web-secret
+
+    

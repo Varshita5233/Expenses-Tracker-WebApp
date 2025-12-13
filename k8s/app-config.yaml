@@ -1,0 +1,8 @@
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  name: expenses-web-config
+  namespace:  dev
+data:
+  SPRING_DATASOURCE_URL: jdbc:mysql://expenses-mysql:3306/expenses_tracker?allowPublicKeyRetrieval=true&useSSL=false
+  SPRING_DATASOURCE_USERNAME: springstudent
