@@ -70,11 +70,16 @@ pipeline{
             agent {
                 docker {
                     image 'bitnami/kubectl:latest'
-                    args '-v /var/lib/jenkins/.kube:/root/.kube'
+                     args '''
+                      -u root
+                      -v /var/lib/jenkins/.kube:/root/.kube
+                      --entrypoint=''
+                    '''
                 }
             }
             steps{
                 sh '''
+                kubectl version --client
                 kubectl apply -f k8s/namespace-dev.yaml
                 kubectl apply -f k8s/
                 kubectl rollout status deployment/expenses-web -n dev
