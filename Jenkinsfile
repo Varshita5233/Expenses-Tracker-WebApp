@@ -1,5 +1,5 @@
 pipeline{
-    agent any
+    agent none
     environment{
         IMAGE_NAME = "jyotsna2181/expenses-tracker-webapp"
         IMAGE_TAG = "latest"
@@ -8,24 +8,46 @@ pipeline{
 
     stages{
         stage('Checkout'){
+            agent{
+                docker{
+                    image 'alpine/git:latest'
+                }
+            }
             steps{
                 checkout scm
             }
         }
 
         stage('Build JAR'){
+            agent{
+                docker{
+                    image 'maven:3.9.9-eclipse-temurin-17'
+                }
+            }
             steps{
                 sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Build Docker Image'){
+            agent{
+                docker{
+                    image 'docker:27-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps{
                 sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
         stage('push Image'){
+            agent{
+                docker{
+                    image 'docker:27-cli'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh '''
@@ -37,6 +59,12 @@ pipeline{
         }
 
         stage("Deploy to Kubernetes"){
+            agent {
+                docker {
+                    image 'bitnami/kubectl:latest'
+                    args '-v /var/lib/jenkins/.kube:/root/.kube'
+                }
+            }
             steps{
                 sh '''
                 kubectl apply -f k8s/namespace-dev.yaml
