@@ -8,11 +8,6 @@ pipeline{
 
     stages{
         stage('Checkout'){
-            agent{
-                docker{
-                    image 'alpine/git:latest'
-                }
-            }
             steps{
                 checkout scm
             }
