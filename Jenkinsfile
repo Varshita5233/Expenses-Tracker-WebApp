@@ -29,7 +29,7 @@ pipeline{
             agent{
                 docker{
                     image 'docker:27-cli'
-                    args '
+                    args '''
                     -v /var/run/docker.sock:/var/run/docker.sock
                     -e DOCKER_CONFIG=/tmp/.docker
                     '''
