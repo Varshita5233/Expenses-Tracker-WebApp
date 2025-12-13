@@ -30,6 +30,7 @@ pipeline{
                 docker{
                     image 'docker:27-cli'
                     args '''
+                    -u root
                     -v /var/run/docker.sock:/var/run/docker.sock
                     -e DOCKER_CONFIG=/tmp/.docker
                     '''
@@ -48,6 +49,7 @@ pipeline{
                 docker{
                     image 'docker:27-cli'
                     args '''
+                    -u root
                     -v /var/run/docker.sock:/var/run/docker.sock
                     -e DOCKER_CONFIG=/tmp/.docker
                     '''
