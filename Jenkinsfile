@@ -4,6 +4,7 @@ pipeline{
         IMAGE_NAME = "jyotsna2181/expenses-tracker-webapp"
         IMAGE_TAG = "latest"
         KUBE_NAMESPACE = "dev"
+        KUBECONFIG = "/root/.kube/config"
     }
 
     stages{
@@ -80,9 +81,10 @@ pipeline{
             steps{
                 sh '''
                 kubectl version --client
-                kubectl apply -f k8s/namespace-dev.yaml
-                kubectl apply -f k8s/
+                kubectl apply -f k8s/namespace-dev.yaml --validate=false
+                kubectl apply -f k8s/ --validate=false
                 kubectl rollout status deployment/expenses-web -n dev
+
                 '''
             }
         }
