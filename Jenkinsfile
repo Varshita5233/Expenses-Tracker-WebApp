@@ -4,7 +4,6 @@ pipeline{
         IMAGE_NAME = "jyotsna2181/expenses-tracker-webapp"
         IMAGE_TAG = "latest"
         KUBE_NAMESPACE = "dev"
-        KUBECONFIG = "/root/.kube/config"
     }
 
     stages{
@@ -30,16 +29,11 @@ pipeline{
             agent{
                 docker{
                     image 'docker:27-cli'
-                    args '''
-                    -u root
-                    -v /var/run/docker.sock:/var/run/docker.sock
-                    -e DOCKER_CONFIG=/tmp/.docker
-                    '''
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps{
                 sh '''
-                mkdir -p /tmp/.docker
                 docker build -t $IMAGE_NAME:$IMAGE_TAG .
                 '''
             }
@@ -49,17 +43,12 @@ pipeline{
             agent{
                 docker{
                     image 'docker:27-cli'
-                    args '''
-                    -u root
-                    -v /var/run/docker.sock:/var/run/docker.sock
-                    -e DOCKER_CONFIG=/tmp/.docker
-                    '''
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh '''
-                      mkdir -p /tmp/.docker
                       echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                       docker push $IMAGE_NAME:$IMAGE_TAG
                     '''
@@ -80,11 +69,11 @@ pipeline{
             }
             steps{
                 sh '''
-                kubectl version --client
-                kubectl apply -f k8s/namespace-dev.yaml --validate=false
-                kubectl apply -f k8s/ --validate=false
+                export KUBECONFIG=/var/jenkins_home/.kube/config
+                kubectl get nodes
+                kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
+                kubectl apply -f k8s/
                 kubectl rollout status deployment/expenses-web -n dev
-
                 '''
             }
         }
