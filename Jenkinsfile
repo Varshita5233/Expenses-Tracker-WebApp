@@ -62,18 +62,19 @@ pipeline{
                     image 'bitnami/kubectl:latest'
                      args '''
                       -u root
-                      -v /var/lib/jenkins/.kube:/root/.kube
+                      -v /root/.kube:/root/.kube
                       --entrypoint=''
                     '''
                 }
             }
             steps{
                 sh '''
-                export KUBECONFIG=/var/jenkins_home/.kube/config
+                export KUBECONFIG=/root/.kube/config
+                kubectl config current-context
                 kubectl get nodes
                 kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
-                kubectl apply -f k8s/
-                kubectl rollout status deployment/expenses-web -n dev
+                kubectl apply -f k8s/ -n $KUBE_NAMESPACE
+                kubectl rollout status deployment/expenses-web -n $KUBE_NAMESPACE
                 '''
             }
         }
