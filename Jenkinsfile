@@ -62,8 +62,8 @@ pipeline{
                     image 'bitnami/kubectl:latest'
                      args '''
                       -u root
-                      -v /root/.kube:/root/.kube
-                      -v /root/.minikube:/root/.minikube
+                      -v /var/jenkins_home/.kube/jenkins:/root/.kube
+                      -v /var/jenkins_home/.minikube:/root/.minikube
                       --entrypoint=''
                     '''
                 }
