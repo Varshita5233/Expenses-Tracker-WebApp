@@ -63,6 +63,7 @@ pipeline{
                      args '''
                       -u root
                       -v /root/.kube:/root/.kube
+                      -v /root/.minikube:/root/.minikube
                       --entrypoint=''
                     '''
                 }
